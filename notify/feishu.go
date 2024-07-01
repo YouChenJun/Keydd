@@ -2,8 +2,8 @@ package notify
 
 import (
 	"Keydd/consts"
+	logger "Keydd/log"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -34,7 +34,7 @@ func sendMsg(cardtext string) {
 	defer result.Body.Close()
 	rspBody, err := ioutil.ReadAll(result.Body)
 	if err != nil {
-		log.Fatalf("ReadAll failed, reqBody: %s, err: %v\n", rspBody, err)
+		logger.Error.Fatalf("ReadAll failed, reqBody: %s, err: %v\n", rspBody, err)
 		return
 	}
 	time.Sleep(1 * time.Second)

@@ -3,11 +3,9 @@ package main
 import (
 	"Keydd/cmd"
 	"Keydd/consts"
-	"Keydd/log"
+	logger "Keydd/log"
 	"fmt"
 	"github.com/lqqyt2423/go-mitmproxy/proxy"
-	"github.com/lqqyt2423/go-mitmproxy/web"
-
 	"regexp"
 	"strings"
 )
@@ -17,20 +15,20 @@ type ChangeHtml struct {
 }
 
 func init() {
-	log.Init()
+	logger.Init()
 	cmd.Init()
 	fmt.Println(consts.Banner)
-	log.Info.Println("启动成功-监听端口为：9080 - 请先安装证书")
+	logger.Info.Println("启动成功-监听端口为：9080 - 请先安装证书")
 	config, err := cmd.ReadYAMLFile()
 	if err != nil {
-		log.Info.Fatal("读取YAML文件失败：", err)
+		logger.Info.Fatal("读取YAML文件失败：", err)
 		return
 	}
 	//正则载入到规则列表里面
 	for _, rule := range config.Rules {
 		regex, err := regexp.Compile(rule.Pattern)
 		if err != nil {
-			log.Info.Fatal("正则表达式编译失败：", err)
+			logger.Info.Fatal("正则表达式编译失败：", err)
 			return
 		}
 		consts.LodaRules[rule.Id] = regex
@@ -57,10 +55,11 @@ func main() {
 	}
 	p, err := proxy.NewProxy(opts)
 	if err != nil {
-		log.Error.Fatalf("err:", err)
+		logger.Error.Fatalf("err:", err)
 	}
-	log.Info.Println("启动成功！请在运行文件夹内寻找证书文件，并安装证书！")
+	logger.Info.Println("启动成功！请在运行文件夹内寻找证书文件，并安装证书！")
 	p.AddAddon(&ChangeHtml{})
-	p.AddAddon(web.NewWebAddon(":9081"))
+	//关闭web页面
+	//p.AddAddon(web.NewWebAddon(":9081"))
 	p.Start()
 }
