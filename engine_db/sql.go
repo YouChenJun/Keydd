@@ -6,6 +6,7 @@ import (
 	"Keydd/notify"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
 )
 
 var db *sql.DB
@@ -34,7 +35,7 @@ func InitDB() *sql.DB {
     	Content_Type VARCHAR(255)
     )`)
 	if err != nil {
-		logger.Error.Printf("sqlerr:", err)
+		log.Printf("sqlerr:", err)
 	}
 	return db
 
