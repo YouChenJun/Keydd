@@ -24,17 +24,19 @@ func init() {
 		logger.Info.Fatal("读取YAML文件失败：", err)
 		return
 	}
-	//正则载入到规则列表里面
+	// 正则载入到规则列表里面
 	for _, rule := range config.Rules {
+		if !rule.Enabled {
+			continue // 如果规则未启用，则跳过
+		}
 		regex, err := regexp.Compile(rule.Pattern)
 		if err != nil {
-			logger.Info.Fatal("正则表达式编译失败：", err)
+			logger.Info.Fatal("正则表达式编译失败,请检测规则是否正确！：", err)
 			return
 		}
 		consts.LodaRules[rule.Id] = regex
 	}
 }
-
 func (c *ChangeHtml) Response(f *proxy.Flow) {
 	contentType := f.Response.Header.Get("Content-Type")
 	if !strings.HasPrefix(contentType, "text/html") &&
@@ -50,7 +52,7 @@ func (c *ChangeHtml) Response(f *proxy.Flow) {
 func main() {
 	opts := &proxy.Options{
 		Addr:              ":9080",
-		StreamLargeBodies: 1024 * 1024 * 5,
+		StreamLargeBodies: 2048 * 2048 * 5,
 		CaRootPath:        "./cert",
 	}
 	p, err := proxy.NewProxy(opts)

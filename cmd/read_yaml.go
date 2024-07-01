@@ -32,14 +32,15 @@ func ReadYAMLFile() (*consts.Rules, error) {
 // 若没有配置文件，则自动创建
 func createConfigFile() {
 	configContent := []byte(`
-#此处规则配置文件来自wih 可以自主编写规则
+# 此处规则配置文件来自wih 可以自主编写规则
 rules:
   # 域名，内置规则
   - id: domain
     enabled: false
   # IP， 内置规则
   - id: ip
-    enabled: false
+    enabled: true
+	pattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
   # 路径，内置规则
   - id: path
     enabled: false
@@ -49,17 +50,17 @@ rules:
   # URL主机部分为IP，内置规则
   - id: ip_url
     enabled: false
-  # 邮箱
-#  - id: email
-#    enabled: false
-#    pattern: \b[A-Za-z0-9._\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,61}\b
+  # 邮箱 - 误报量大默认关闭
+  - id: email
+    enabled: false
+    pattern: \b[A-Za-z0-9._\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,61}\b
   # 二代身份证
   - id: id_card
     enabled: true
     pattern: \b([1-9]\d{5}(19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx])\b
   # 手机号
   - id: phone
-    enabled: false
+    enabled: true
     pattern: \b1[3-9]\d{9}\b
   # jwt token (不要修改ID)
   - id: jwt_token

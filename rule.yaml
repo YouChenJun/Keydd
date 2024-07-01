@@ -38,7 +38,7 @@ rules:
   # URL主机部分为IP，内置规则
   - id: ip_url
     enabled: false
-  # 邮箱
+  # 邮箱-误报量大
 #  - id: email
 #    enabled: false
 #    pattern: \b[A-Za-z0-9._\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,61}\b
