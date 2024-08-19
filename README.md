@@ -1,4 +1,9 @@
 # Keydd
+
+![Keydd](https://socialify.git.ci/YouChenJun/Keydd/image?description=1&descriptionEditable=%E4%BB%8E%E6%B5%81%E9%87%8F%E5%8C%85%E5%8C%B9%E9%85%8D%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF%E7%9A%84%E6%B8%97%E9%80%8F%E7%A5%9E%E5%99%A8&font=Inter&forks=1&issues=1&language=1&logo=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F53772533%3Fv%3D4%26size%3D400&name=1&owner=1&pattern=Floating%20Cogs&stargazers=1&theme=Dark)
+
+
+
 # 一、免责说明
 
 - 本工具仅面向合法授权的企业安全建设行为与个人学习行为，如您需要测试本工具的可用性，请自行搭建靶机环境。
@@ -66,4 +71,8 @@
 ​	如果需要使用消息提醒功能，请在`rule.yaml`中加入`lark_Webhook`的配置信息（暂时只支持飞书消息提醒）、**为了防止大量发送信息，这里采用了sleep(1s)进行限速！**消息提醒效果如下
 
 ![image-20240819220713967](README.assets/image-20240819220713967.png)
+
+​	最后，欢迎师傅们使用，提issue！
+
+
 
