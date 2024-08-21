@@ -24,5 +24,5 @@ var Banner = `
 \_| \_/\___|\__, |\__,_|\__,_|
              __/ |            
             |___/
-				v1.3	by@Chen_dark
+				v1.4	by@Chen_dark
 `

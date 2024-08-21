@@ -3,7 +3,7 @@ package cmd
 import (
 	"Keydd/consts"
 	"Keydd/engine_db"
-	"github.com/lqqyt2423/go-mitmproxy/proxy"
+	"Keydd/go-mitmproxy/proxy"
 	"strings"
 )
 

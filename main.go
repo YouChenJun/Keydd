@@ -3,10 +3,10 @@ package main
 import (
 	"Keydd/cmd"
 	"Keydd/consts"
+	"Keydd/go-mitmproxy/proxy"
 	logger "Keydd/log"
 	"Keydd/notify"
 	"fmt"
-	"github.com/lqqyt2423/go-mitmproxy/proxy"
 	"regexp"
 	"strings"
 	"sync"

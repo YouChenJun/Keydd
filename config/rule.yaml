@@ -1,37 +1,4 @@
-package cmd
-
-import (
-	"Keydd/consts"
-	logger "Keydd/log"
-	"Keydd/utils"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
-)
-
-func Init() {
-	if !utils.FileExists("./config/rule.yaml") {
-		createConfigFile()
-	}
-}
-
-// 读取配置文件没使用viper 目前不影响使用 不支持热更新
-func ReadYAMLFile() (*consts.Rules, error) {
-	data, err := ioutil.ReadFile("./config/rule.yaml")
-	if err != nil {
-		return nil, err
-	}
-	var config consts.Rules
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
-		return nil, err
-	}
-	return &config, nil
-}
-
-// 若没有配置文件，则自动创建
-func createConfigFile() {
-	configContent := []byte(`# 此处规则配置文件来自wih 可以自主编写规则
+# 此处规则配置文件来自wih 可以自主编写规则
 rules:
   # 域名，内置规则
   - id: domain
@@ -190,15 +157,3 @@ exclude_rules:
 # 这里需要去获取飞书webhook
 lark_Webhook: 
 
-`)
-	err := os.MkdirAll("./config", os.ModePerm)
-	if err != nil {
-		logger.Error.Fatal("创建目录失败:", err)
-		return
-	}
-	err = os.WriteFile("./config/rule.yaml", configContent, 0644)
-	if err != nil {
-		logger.Error.Fatal("创建配置文件失败", err)
-	}
-	logger.Info.Fatal("配置文件创建成功，需要手动修改配置文件中的连接信息")
-}
