@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	logger "Keydd/log"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -293,11 +294,12 @@ func (a *attacker) httpsDial(ctx context.Context, req *http.Request) (net.Conn, 
 
 func (a *attacker) httpsTlsDial(ctx context.Context, cconn net.Conn, conn net.Conn) {
 	connCtx := cconn.(*wrapClientConn).connCtx
+	log.SetOutput(io.Discard)
 	log := log.WithFields(log.Fields{
 		"in":   "Proxy.attacker.httpsTlsDial",
 		"host": connCtx.ClientConn.Conn.RemoteAddr().String(),
 	})
-
+	logger.Error.Println("Proxy.attacker.httpsTlsDial---", connCtx.ClientConn.Conn.RemoteAddr().String())
 	var clientHello *tls.ClientHelloInfo
 	clientHelloChan := make(chan *tls.ClientHelloInfo)
 	serverTlsStateChan := make(chan *tls.ConnectionState)
@@ -377,11 +379,12 @@ func (a *attacker) httpsTlsDial(ctx context.Context, cconn net.Conn, conn net.Co
 
 func (a *attacker) httpsLazyAttack(ctx context.Context, cconn net.Conn, req *http.Request) {
 	connCtx := cconn.(*wrapClientConn).connCtx
+	log.SetOutput(io.Discard)
 	log := log.WithFields(log.Fields{
 		"in":   "Proxy.attacker.httpsLazyAttack",
 		"host": connCtx.ClientConn.Conn.RemoteAddr().String(),
 	})
-
+	logger.Error.Println("Proxy.attacker.httpsLazyAttack---", connCtx.ClientConn.Conn.RemoteAddr().String())
 	clientTlsConn := tls.Server(cconn, &tls.Config{
 		SessionTicketsDisabled: true, // 设置此值为 true ，确保每次都会调用下面的 GetConfigForClient 方法
 		GetConfigForClient: func(chi *tls.ClientHelloInfo) (*tls.Config, error) {
