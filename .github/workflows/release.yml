@@ -1,0 +1,121 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux amd64
+          - name: linux-amd64
+            os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            cc: gcc
+            artifact: keydd-linux-amd64
+
+          # Linux arm64（交叉编译）
+          - name: linux-arm64
+            os: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            cc: aarch64-linux-gnu-gcc
+            artifact: keydd-linux-arm64
+
+          # macOS amd64（Intel）
+          - name: darwin-amd64
+            os: macos-13
+            goos: darwin
+            goarch: amd64
+            cc: gcc
+            artifact: keydd-darwin-amd64
+
+          # macOS arm64（Apple Silicon）
+          - name: darwin-arm64
+            os: macos-latest
+            goos: darwin
+            goarch: arm64
+            cc: gcc
+            artifact: keydd-darwin-arm64
+
+          # Windows amd64
+          - name: windows-amd64
+            os: ubuntu-latest
+            goos: windows
+            goarch: amd64
+            cc: x86_64-w64-mingw32-gcc
+            artifact: keydd-windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # Linux arm64 交叉编译工具链
+      - name: Install arm64 cross-compiler
+        if: matrix.name == 'linux-arm64'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      # Windows 交叉编译工具链
+      - name: Install Windows cross-compiler
+        if: matrix.name == 'windows-amd64'
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "1"
+          CC: ${{ matrix.cc }}
+        run: |
+          go build -v -trimpath \
+            -ldflags="-s -w -X main.Version=${{ github.ref_name }}" \
+            -o ${{ matrix.artifact }} \
+            .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}
+          retention-days: 7
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
