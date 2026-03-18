@@ -1,0 +1,241 @@
+# Keydd 规则完整测试数据集
+# 每条规则必须包含至少一个 should_match: true 的用例
+# should_match: false 的用例为可选的负向测试
+
+test_suites:
+
+  - rule_id: email
+    cases:
+      - input: "user@example.com"
+        should_match: true
+      - input: "admin@corp.cn"
+        should_match: true
+      - input: "not-an-email"
+        should_match: false
+
+  - rule_id: id_card
+    cases:
+      - input: "110101199001011234"
+        should_match: true
+      - input: "440305199408156215"
+        should_match: true
+      - input: "12345"
+        should_match: false
+
+  - rule_id: phone
+    cases:
+      - input: "13812345678"
+        should_match: true
+      - input: "19988887777"
+        should_match: true
+      - input: "12312345678"
+        should_match: false
+      - input: "abcdefghijk"
+        should_match: false
+
+  - rule_id: jwt_token
+    cases:
+      - input: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        should_match: true
+      - input: "not.a.token"
+        should_match: false
+
+  - rule_id: Aliyun_AK_ID
+    cases:
+      - input: "LTAI5tFakeAliyunKeyExample123"
+        should_match: true
+      - input: "InvalidKey123"
+        should_match: false
+
+  - rule_id: QCloud_AK_ID
+    cases:
+      - input: "AKIDFakeQCloudKeyExample123456"
+        should_match: true
+      - input: "NotAKey"
+        should_match: false
+
+  - rule_id: JDCloud_AK_ID
+    cases:
+      - input: "JDC_FAKEKEY1234567890ABCDEFGHIJK"
+        should_match: true
+      - input: "JDC_SHORT"
+        should_match: false
+
+  - rule_id: AWS_AK_ID
+    cases:
+      - input: '"AKIAIOSFODNN7EXAMPLE"'
+        should_match: true
+      - input: "'AGPAI1234567890ABCDE'"
+        should_match: true
+      - input: "NotAnAWSKey"
+        should_match: false
+
+  - rule_id: VolcanoEngine_AK_ID
+    cases:
+      - input: "AKLTfakeVolcanoEngineKey1234567890abcdef12"
+        should_match: true
+      - input: "AKTPfakeVolcanoEngineKey1234567890abcdef12"
+        should_match: true
+      - input: "AKLT_short"
+        should_match: false
+
+  - rule_id: Kingsoft_AK_ID
+    cases:
+      - input: "AKLTfakeKingsoftKey1234567"
+        should_match: true
+      - input: "NotAKey"
+        should_match: false
+
+  - rule_id: GCP_AK_ID
+    cases:
+      - input: "AIzaABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHI"
+        should_match: true
+      - input: "NotAGCPKey"
+        should_match: false
+
+  - rule_id: bearer_token
+    cases:
+      - input: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9abcdefghij"
+        should_match: true
+      - input: "bearer somevalidtoken12345678901234"
+        should_match: true
+      - input: "Basic sometoken"
+        should_match: false
+
+  - rule_id: basic_token
+    cases:
+      - input: "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
+        should_match: true
+      - input: "basic dXNlcm5hbWU6cGFzc3dvcmQ="
+        should_match: true
+      - input: "Bearer token"
+        should_match: false
+
+  - rule_id: auth_token
+    cases:
+      - input: '"Authorization": "Token abcdefghijklmnopqrstuvwxyz1234"'
+        should_match: true
+      - input: "Authorization=abcdefghijklmnopqrstuvwxyz1234"
+        should_match: true
+
+  - rule_id: private_key
+    cases:
+      - input: "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA0Z3VS5JJcds3xHn/ygWep4\n-----END RSA PRIVATE KEY-----"
+        should_match: true
+      - input: "not a private key"
+        should_match: false
+
+  - rule_id: gitlab_v2_token
+    cases:
+      - input: "glpat-FakeGitLabToken12345"
+        should_match: true
+      - input: "glpat-short"
+        should_match: false
+
+  - rule_id: github_token
+    cases:
+      - input: "ghp_FakeGitHubPersonalAccessTokenExample1234567890"
+        should_match: true
+      - input: "gho_FakeGitHubOAuthTokenExample12345678901234567"
+        should_match: true
+      - input: "github_pat_FakePatToken1234567890abcdefghijklmnopqr"
+        should_match: true
+      - input: "not_a_github_token"
+        should_match: false
+
+  - rule_id: qcloud_api_gateway_appkey
+    cases:
+      - input: "APIDFakeQCloudAPIGatewayKey12345678901"
+        should_match: true
+      - input: "APID_short"
+        should_match: false
+
+  - rule_id: wechat_appid
+    cases:
+      - input: '"wx1234567890abcdef0"'
+        should_match: true
+      - input: "'wx1234567890abcdef1'"
+        should_match: true
+      - input: "wx_not_quoted"
+        should_match: false
+
+  - rule_id: wechat_corpid
+    cases:
+      - input: '"ww1234567890abcdef0"'
+        should_match: true
+      - input: "'ww1234567890abcdef1'"
+        should_match: true
+
+  - rule_id: wechat_id
+    cases:
+      - input: '"gh_1234567890a"'
+        should_match: true
+      - input: "'gh_abcde123456'"
+        should_match: true
+
+  - rule_id: password
+    cases:
+      - input: "password='mysecret123'"
+        should_match: true
+      - input: 'user_password:"hello@world"'
+        should_match: true
+      - input: "no_password_here"
+        should_match: false
+
+  - rule_id: wechat_webhookurl
+    cases:
+      - input: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=abcdef12-3456-7890-abcd-ef1234567890"
+        should_match: true
+      - input: "https://other.domain.com"
+        should_match: false
+
+  - rule_id: dingtalk_webhookurl
+    cases:
+      - input: "https://oapi.dingtalk.com/robot/send?access_token=abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678"
+        should_match: true
+      - input: "https://other.domain.com"
+        should_match: false
+
+  - rule_id: feishu_webhookurl
+    cases:
+      - input: "https://open.feishu.cn/open-apis/bot/v2/hook/abcdef12-3456-7890-abcde-ef12"
+        should_match: true
+      - input: "https://other.domain.com"
+        should_match: false
+
+  - rule_id: slack_webhookurl
+    cases:
+      - input: "https://hooks.slack.com/services/ABCDEF12/GHIJKL34/MNOPQRSTUVWXYZabcde1234"
+        should_match: true
+      - input: "https://other.domain.com"
+        should_match: false
+
+  - rule_id: grafana_api_key
+    cases:
+      - input: "eyJrIjoiABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789AB"
+        should_match: true
+      - input: "not_a_grafana_key"
+        should_match: false
+
+  - rule_id: grafana_cloud_api_token
+    cases:
+      - input: "glc_FakeGrafanaCloudAPITokenABCDEFGHIJKLMNOPQRSTUVWXYZ01234567=="
+        should_match: true
+      - input: "not_a_grafana_cloud_token"
+        should_match: false
+
+  - rule_id: grafana_service_account_token
+    cases:
+      - input: "glsa_ABCDEFGHIJKLMNOPQRSTUVWXYZabcd12_1a2b3c4d"
+        should_match: true
+      - input: "not_a_grafana_service_token"
+        should_match: false
+
+  - rule_id: app_key
+    cases:
+      - input: 'APP_SECRET_KEY:"FakeAppSecretKeyValue1234567"'
+        should_match: true
+      - input: 'VUE_APP_TOKEN:"FakeVueAppTokenValue12345678"'
+        should_match: true
+      - input: "no_app_key_here"
+        should_match: false

@@ -1,0 +1,27 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Build output
+/Keydd
+*.exe
+
+# Certificates and config (generated at runtime)
+*.pem
+*.crt
+*.key
+
+# Logs
+log/
+
+# OS
+.DS_Store
+Thumbs.db
+
+*.log

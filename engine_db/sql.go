@@ -5,7 +5,7 @@ import (
 	logger "Keydd/log"
 	"Keydd/notify"
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 	"log"
 )
 
@@ -18,7 +18,7 @@ func init() {
 
 // 初始化数据库连接
 func InitDB() *sql.DB {
-	db, err = sql.Open("sqlite3", "./data.db")
+	db, err = sql.Open("sqlite", "file:data.db?cache=shared&mode=rwc")
 	if err != nil {
 		logger.Error.Printf("sqlerr:", err)
 	}

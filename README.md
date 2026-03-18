@@ -92,7 +92,121 @@
 
 ![image-20240822001156383](README.assets/image-20240822001156383.png)
 
-# 四、说明
+# 四、测试
+
+本项目包含完整的单元测试和集成测试覆盖，确保代码质量和功能正确性。
+
+## 测试运行
+
+在项目根目录运行所有测试：
+
+```bash
+go test ./...
+```
+
+运行特定测试包：
+
+```bash
+go test ./cmd
+go test ./notify
+go test ./tests/rules
+go test ./go-mitmproxy/...
+```
+
+## 测试覆盖范围
+
+### 1. 规则验证测试 (`cmd/rule_validator_test.go`)
+
+测试规则配置的有效性和正确性：
+
+- **TestValidateRules_AllPass**: 验证格式正确的规则通过检查（电话号码、JWT令牌等）
+- **TestValidateRules_DisabledRuleSkipped**: 禁用的规则跳过验证检查
+- **TestValidateRules_InvalidRegex**: 捕获格式错误的正则表达式
+- **TestValidateRules_NoTestCase**: 验证规则包含测试用例
+- **TestValidateRules_MatchFailed**: 检测测试用例与其模式不匹配
+- **TestValidateRules_BuiltinSkip**: 内置规则（domain、path、secret_key、ip）绕过模式和测试用例检查
+- **TestValidateRules_NoPattern**: 捕获启用的规则中缺失的模式
+- **TestValidateRules_MultipleErrors**: 捕获和报告多个验证错误
+
+### 2. 飞书通知测试 (`notify/feishu_test.go`)
+
+测试敏感信息发现时的通知功能：
+
+- **TestSendmesg**: 测试向飞书Webhook发送通知消息
+
+### 3. 规则引擎和YAML测试 (`tests/rules/runner_test.go`)
+
+综合规则测试基础设施：
+
+- **TestAllRulesFromYAML**: 加载 `testcases.yaml` 和 `rule.yaml`，针对所有规则执行正则匹配测试，报告通过/失败统计
+- **TestRuleYAMLSyntax**: 验证 `rule.yaml` 语法和结构可以正确解析
+- **TestAllPatternCompilable**: 验证所有启用规则的正则表达式编译无误
+- **辅助功能**: 从YAML加载测试用例、从配置加载规则、截断长字符串以显示在错误消息中
+
+### 4. 代理映射测试 (`go-mitmproxy/addon/mapremote_test.go`)
+
+测试请求URL映射和重写功能：
+
+- **TestMapItemMatch**: 验证URL是否匹配映射规则（考虑协议、主机、方法和路径），支持通配符匹配
+  - 测试精确匹配和空字段匹配
+  - 测试协议、主机、方法和路径不匹配的情况
+- **TestMapItemReplace**: 测试匹配后的URL替换逻辑
+  - 验证协议、主机和路径替换
+  - 测试通配符路径处理
+
+### 5. 证书生成测试 (`go-mitmproxy/cert/self_sign_ca_test.go`)
+
+测试自签名CA证书生成：
+
+- **TestGetStorePath**: 验证证书存储路径生成
+- **TestNewCA**: 创建新CA证书、保存并验证文件内容匹配
+
+### 6. 主机匹配测试 (`go-mitmproxy/internal/helper/host_test.go`)
+
+测试支持通配符的主机匹配：
+
+- **TestMatchHost**: 7个测试用例覆盖：
+  - 带/不带端口的精确主机匹配
+  - 不匹配场景
+  - 通配符模式匹配 (*.domain.com)
+  - 通配符+端口组合
+  - 端口不匹配场景
+
+### 7. TLS连接状态测试 (`go-mitmproxy/proxy/connection_test.go`)
+
+测试HTTPS/TLS连接处理：
+
+- **TestConnection**: 测试客户端连接TLS状态跟踪（HTTP、HTTPS和HTTP/2）
+  - 验证TLS标志和协议协商 (h2)
+- **TestConnectionOffUpstreamCert**: 测试禁用上游证书验证时的行为
+  - 验证h2不可用时协议回退到http/1.1
+
+### 8. 综合代理测试 (`go-mitmproxy/proxy/proxy_test.go`)
+
+广泛的代理功能测试（425行代码）：
+
+- **TestProxy**: 核心代理功能
+  - HTTP/HTTPS代理
+  - 请求/响应拦截
+  - 处理错误的主机名
+  - Keep-alive连接管理
+  - 连接生命周期（ClientConnected/Disconnected、ServerConnected/Disconnected）
+- **TestProxyWhenServerNotKeepAlive**: 测试服务器端禁用keep-alive时的代理行为
+- **TestProxyWhenServerKeepAliveButCloseImmediately**: 测试快速连接关闭场景
+- **TestProxyClose**: 验证代理优雅关闭
+- **TestProxyShutdown**: 验证基于context的代理关闭
+- **TestOnUpstreamCert**: 测试使用上游证书时的TLS建立顺序
+- **TestOffUpstreamCert**: 测试禁用上游证书验证时的行为
+- 包含自定义插件测试基础设施（`testOrderAddon`、`interceptAddon`）以验证插件执行顺序和流程控制
+
+## 测试特点
+
+- **YAML驱动测试**: `runner_test.go` 使用独立的 `testcases.yaml` 文件进行规则验证，便于添加新测试用例
+- **集成测试**: 代理测试使用实际的HTTP服务器和客户端连接，而不仅仅是模拟对象
+- **覆盖范围**: 测试涵盖核心功能——规则验证、代理机制、证书处理和通知功能
+- **代码质量**: 用于确保敏感信息检测准确性和代理功能可靠性
+
+# 五、说明
 
 ## :notebook:TODO
 
@@ -143,7 +257,7 @@
 
 ​	这种情况可能是短时间内检测到大量的敏感信息，飞书webhook频繁访问，导致接口限流，发送失败。后面会优化代码，采取消息队列、限频等方式优化
 
-# 五、更新日志
+# 六、更新日志
 
 ## v1.3
 

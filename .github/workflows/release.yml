@@ -11,89 +11,27 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Linux amd64
-          - name: linux-amd64
-            os: ubuntu-latest
-            goos: linux
-            goarch: amd64
-            cc: gcc
-            artifact: keydd-linux-amd64
-
-          # Linux arm64（交叉编译）
-          - name: linux-arm64
-            os: ubuntu-latest
-            goos: linux
-            goarch: arm64
-            cc: aarch64-linux-gnu-gcc
-            artifact: keydd-linux-arm64
-
-          # macOS amd64（Intel）
-          - name: darwin-amd64
-            os: macos-13
-            goos: darwin
-            goarch: amd64
-            cc: gcc
-            artifact: keydd-darwin-amd64
-
-          # macOS arm64（Apple Silicon）
-          - name: darwin-arm64
-            os: macos-latest
-            goos: darwin
-            goarch: arm64
-            cc: gcc
-            artifact: keydd-darwin-arm64
-
-          # Windows amd64
-          - name: windows-amd64
-            os: ubuntu-latest
-            goos: windows
-            goarch: amd64
-            cc: x86_64-w64-mingw32-gcc
-            artifact: keydd-windows-amd64.exe
+    name: Generate cross-platform builds
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Generate build files
+        uses: thatisuday/go-cross-build@v1
         with:
-          go-version-file: go.mod
-          cache: true
+          platforms: 'linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64'
+          package: ''
+          name: 'keydd'
+          compress: 'true'
+          dest: 'dist'
 
-      # Linux arm64 交叉编译工具链
-      - name: Install arm64 cross-compiler
-        if: matrix.name == 'linux-arm64'
-        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
-
-      # Windows 交叉编译工具链
-      - name: Install Windows cross-compiler
-        if: matrix.name == 'windows-amd64'
-        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64
-
-      - name: Build
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: "1"
-          CC: ${{ matrix.cc }}
-        run: |
-          go build -v -trimpath \
-            -ldflags="-s -w -X main.Version=${{ github.ref_name }}" \
-            -o ${{ matrix.artifact }} \
-            .
-
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.artifact }}
+          name: keydd-release
+          path: dist/
           retention-days: 7
 
   release:
@@ -103,19 +41,19 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - name: Download all artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
-          merge-multiple: true
+          name: keydd-release
+          path: dist/
 
       - name: List artifacts
-        run: ls -lh artifacts/
+        run: ls -lh dist/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*
+          files: dist/*
           generate_release_notes: true
           draft: false
           prerelease: false
