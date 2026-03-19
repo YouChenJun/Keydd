@@ -3,10 +3,12 @@ package main
 import (
 	"Keydd/cmd"
 	"Keydd/consts"
-	"Keydd/go-mitmproxy/proxy"
+	"github.com/lqqyt2423/go-mitmproxy/proxy"
 	logger "Keydd/log"
 	"Keydd/notify"
+	"flag"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"sync"
@@ -28,6 +30,12 @@ func init() {
 		logger.Info.Fatal("读取YAML文件失败：", err)
 		return
 	}
+
+	// 验证规则配置（警告模式：有问题仅输出警告，不阻止启动）
+	if validErrs := cmd.ValidateRules(config.Rules); len(validErrs) > 0 {
+		cmd.PrintValidationReport(config.Rules, validErrs)
+	}
+
 	// 正则载入到规则列表里面
 	for _, rule := range config.Rules {
 		if !rule.Enabled {
@@ -75,6 +83,23 @@ func (c *ChangeHtml) Response(f *proxy.Flow) {
 }
 
 func main() {
+	testRules := flag.Bool("test-rules", false, "验证规则文件并退出，不启动代理服务")
+	flag.Parse()
+
+	if *testRules {
+		config, err := cmd.ReadYAMLFile()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "读取规则文件失败: %v\n", err)
+			os.Exit(1)
+		}
+		errs := cmd.ValidateRules(config.Rules)
+		cmd.PrintValidationReport(config.Rules, errs)
+		if len(errs) > 0 {
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
+
 	opts := &proxy.Options{
 		Addr:              ":9080",
 		StreamLargeBodies: 2048 * 2048 * 5,

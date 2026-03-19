@@ -2,9 +2,10 @@ package consts
 
 // 白名单规则yaml对应关系
 type Rule struct {
-	Id      string `yaml:"id"`
-	Enabled bool   `yaml:"enabled"`
-	Pattern string `yaml:"pattern"`
+	Id        string   `yaml:"id"`
+	Enabled   bool     `yaml:"enabled"`
+	Pattern   string   `yaml:"pattern"`
+	TestCases []string `yaml:"test_cases"`
 }
 
 // 排除规则
