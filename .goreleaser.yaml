@@ -1,0 +1,54 @@
+project_name: Keydd
+builds:
+  - id: keydd-darwin
+    main: main.go
+    binary: Keydd
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+  - id: keydd-linux
+    main: main.go
+    binary: Keydd
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - 386
+    env:
+      - CGO_ENABLED=0
+  - id: keydd-windows
+    main: main.go
+    binary: Keydd
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}macos
+      {{- else }}{{ .Os }}{{ end }}_
+      {{ .Arch }}
+release:
+  github:
+    owner: YouChenJun
+    name: Keydd
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

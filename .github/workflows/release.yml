@@ -1,59 +1,28 @@
-name: Release Build
+name: Release
 
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
-
-permissions:
-  contents: write
+      - 'v*.*'
 
 jobs:
-  build:
-    name: Generate cross-platform builds
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Generate build files
-        uses: thatisuday/go-cross-build@v1
-        with:
-          platforms: 'linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64'
-          package: ''
-          name: 'keydd'
-          compress: 'true'
-          dest: 'dist'
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: keydd-release
-          path: dist/
-          retention-days: 7
-
   release:
-    name: Create Release
-    needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          name: keydd-release
-          path: dist/
+          fetch-depth: 0
 
-      - name: List artifacts
-        run: ls -lh dist/
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
-          files: dist/*
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+          go-version: '1.23'
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

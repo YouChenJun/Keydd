@@ -50,46 +50,68 @@ rules:
   - id: email
     enabled: false
     pattern: \b[A-Za-z0-9._\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,61}\b
+    test_cases:
+      - "user@example.com"
   # 二代身份证
   - id: id_card
     enabled: true
     pattern: \b([1-9]\d{5}(19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx])\b
+    test_cases:
+      - "110101199001011234"
   # 手机号
   - id: phone
     enabled: true
     pattern: \b1[3-9]\d{9}\b
+    test_cases:
+      - "13812345678"
   # jwt token (不要修改ID)
   - id: jwt_token
     enabled: true
     pattern: eyJ[A-Za-z0-9_/+\-]{10,}={0,2}\.[A-Za-z0-9_/+\-\\]{15,}={0,2}\.[A-Za-z0-9_/+\-\\]{10,}={0,2}
+    test_cases:
+      - "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
   # 阿里云 AccessKey ID (不要修改ID)
   - id: Aliyun_AK_ID
     enabled: true
     pattern: \bLTAI[A-Za-z\d]{12,30}\b
+    test_cases:
+      - "LTAI5tFakeAliyunKeyExample123"
   # 腾讯云 AccessKey ID (不要修改ID)
   - id: QCloud_AK_ID
     enabled: true
     pattern: \bAKID[A-Za-z\d]{13,40}\b
+    test_cases:
+      - "AKIDFakeQCloudKeyExample123456"
   # 京东云 AccessKey ID (不要修改ID)
   - id: JDCloud_AK_ID
     enabled: true
     pattern: \bJDC_[0-9A-Z]{25,40}\b
+    test_cases:
+      - "JDC_FAKEKEY1234567890ABCDEFGHIJK"
   # 亚马逊 AccessKey ID
   - id: AWS_AK_ID
     enabled: true
     pattern: '["''](?:A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}["'']'
+    test_cases:
+      - '"AKIAIOSFODNN7EXAMPLE"'
   # 火山引擎 AccessKey ID
   - id: VolcanoEngine_AK_ID
     enabled: true
     pattern: \b(?:AKLT|AKTP)[a-zA-Z0-9]{35,50}\b
+    test_cases:
+      - "AKLTfakeVolcanoEngineKey1234567890abcdef12345"
   # 金山云 AccessKey ID
   - id: Kingsoft_AK_ID
     enabled: true
     pattern: \bAKLT[a-zA-Z0-9-_]{16,28}\b
+    test_cases:
+      - "AKLTfakeKingsoftKey1234567"
   # 谷歌云 AccessKey ID
   - id: GCP_AK_ID
     enabled: true
     pattern: \bAIza[0-9A-Za-z_\-]{35}\b
+    test_cases:
+      - "AIzaSyFakeGoogleAPIKeyABCDEFGHIJK12345"
   # 提取 SecretKey, 内置规则
   - id: secret_key
     enabled: true
@@ -97,77 +119,115 @@ rules:
   - id: bearer_token
     enabled: true
     pattern: \b[Bb]earer\s+[a-zA-Z0-9\-=._+/\\]{20,500}\b
+    test_cases:
+      - "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9abcdefghij"
   # Basic Token
   - id: basic_token
     enabled: true
     pattern: \b[Bb]asic\s+[A-Za-z0-9+/]{18,}={0,2}\b
+    test_cases:
+      - "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
   # Auth Token
   - id: auth_token
     enabled: true
     pattern: '["''\[]*[Aa]uthorization["''\]]*\s*[:=]\s*[''"]?\b(?:[Tt]oken\s+)?[a-zA-Z0-9\-_+/]{20,500}[''"]?'
+    test_cases:
+      - '"Authorization": "Token abcdefghijklmnopqrstuvwxyz1234"'
   # PRIVATE KEY
   - id: private_key
     enabled: true
     pattern: -----\s*?BEGIN[ A-Z0-9_-]*?PRIVATE KEY\s*?-----[a-zA-Z0-9\/\n\r=+]*-----\s*?END[ A-Z0-9_-]*? PRIVATE KEY\s*?-----
+    test_cases:
+      - "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA0Z3VS5JJcds3xHn\n-----END RSA PRIVATE KEY-----"
   #Gitlab V2 Token
   - id: gitlab_v2_token
     enabled: true
     pattern: \b(glpat-[a-zA-Z0-9\-=_]{20,22})\b
+    test_cases:
+      - "glpat-FakeGitLabToken12345"
   #Github Token
   - id: github_token
     enabled: true
     pattern: \b((?:ghp|gho|ghu|ghs|ghr|github_pat)_[a-zA-Z0-9_]{36,255})\b
+    test_cases:
+      - "ghp_FakeGitHubPersonalAccessTokenExample1234567890"
   #腾讯云 API网关 APPKEY
   - id: qcloud_api_gateway_appkey
     enabled: true
     pattern: \bAPID[a-zA-Z0-9]{32,42}\b
+    test_cases:
+      - "APIDFakeQCloudAPIGatewayAppKey12345678901234567"
   #微信 公众号/小程序 APPID
   - id: wechat_appid
     enabled: true
     pattern: '["''](wx[a-z0-9]{15,18})["'']'
+    test_cases:
+      - '"wx1234567890abcdef0"'
   #企业微信 corpid
   - id: wechat_corpid
     enabled: true
     pattern: '["''](ww[a-z0-9]{15,18})["'']'
+    test_cases:
+      - '"ww1234567890abcdef0"'
   #微信公众号
   - id: wechat_id
     enabled: true
     pattern: '["''](gh_[a-z0-9]{11,13})["'']'
+    test_cases:
+      - '"gh_1234567890a"'
   # 密码
   - id: password
     enabled: true
     pattern: (?i)(?:admin_?pass|password|[a-z]{3,15}_?password|user_?pass|user_?pwd|admin_?pwd)\\?['"]*\s*[:=]\s*\\?['"][a-z0-9!@#$%&*]{5,50}\\?['"]
+    test_cases:
+      - "password='mysecret123'"
   # 企业微信 webhook
   - id: wechat_webhookurl
     enabled: true
     pattern: \bhttps://qyapi.weixin.qq.com/cgi-bin/webhook/send\?key=[a-zA-Z0-9\-]{25,50}\b
+    test_cases:
+      - "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=abcdef12-3456-7890-abcd-ef1234567890"
   # 钉钉 webhook
   - id: dingtalk_webhookurl
     enabled: true
     pattern: \bhttps://oapi.dingtalk.com/robot/send\?access_token=[a-z0-9]{50,80}\b
+    test_cases:
+      - "https://oapi.dingtalk.com/robot/send?access_token=abcdef1234567890abcdef1234567890abcdef1234567890ab"
   # 飞书 webhook
   - id: feishu_webhookurl
     enabled: true
     pattern: \bhttps://open.feishu.cn/open-apis/bot/v2/hook/[a-z0-9\-]{25,50}\b
+    test_cases:
+      - "https://open.feishu.cn/open-apis/bot/v2/hook/abcdef12-3456-7890-abcd-ef"
   # slack webhook
   - id: slack_webhookurl
     enabled: true
     pattern: \bhttps://hooks.slack.com/services/[a-zA-Z0-9\-_]{6,12}/[a-zA-Z0-9\-_]{6,12}/[a-zA-Z0-9\-_]{15,24}\b
+    test_cases:
+      - "https://hooks.slack.com/services/ABCDEF12/GHIJKL34/MNOPQRSTUVWXYZabc"
   # grafana api key
   - id: grafana_api_key
     enabled: true
     pattern: \beyJrIjoi[a-zA-Z0-9\-_+/]{50,100}={0,2}\b
+    test_cases:
+      - "eyJrIjoiABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789AB"
   # grafana cloud api token
   - id: grafana_cloud_api_token
     enabled: true
     pattern: \bglc_[A-Za-z0-9\-_+/]{32,200}={0,2}\b
+    test_cases:
+      - "glc_FakeGrafanaCloudAPITokenABCDEFGHIJKLMNOPQRSTU"
   # grafana service account token
   - id: grafana_service_account_token
     enabled: true
     pattern: \bglsa_[A-Za-z0-9]{32}_[A-Fa-f0-9]{8}\b
+    test_cases:
+      - "glsa_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef12_1a2b3c4d"
   - id: app_key
     enabled: true
     pattern: \b(?:VUE|APP|REACT)_[A-Z_0-9]{1,15}_(?:KEY|PASS|PASSWORD|TOKEN|APIKEY)['"]*[:=]"(?:[A-Za-z0-9_\-]{15,50}|[a-z0-9/+]{50,100}==?)"
+    test_cases:
+      - 'APP_SECRET_KEY:"FakeAppSecretKeyValue1234567"'
 
 # 排除规则， 支持字段 id, content, target , source 逻辑为 and ，如果是正则匹配，需要使用 regex: 开头
 exclude_rules:
