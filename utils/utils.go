@@ -70,7 +70,7 @@ func ReadFileData(filePath string) []byte {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		// 可以选择记录日志或者返回带文件路径的错误
-		logger.Error.Printf("error!! reading file %s: %w", filePath, err)
+		logger.Error.Printf("error!! reading file %s: %v", filePath, err)
 		return nil
 	}
 	return data

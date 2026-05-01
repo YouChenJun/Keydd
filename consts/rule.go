@@ -17,6 +17,9 @@ type ExcludeRule struct {
 	SourceTag string `yaml:"source_tag"`
 	Enabled   bool   `yaml:"enabled"`
 }
+
+// Rules 规则配置文件结构（rule.yaml）
+// 只包含规则和飞书 webhook
 type Rules struct {
 	Rules        []Rule        `yaml:"rules"`
 	ExcludeRules []ExcludeRule `yaml:"exclude_rules"`

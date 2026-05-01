@@ -54,6 +54,6 @@ func Init() {
 	Info = log.New(io.MultiWriter(infoFile, os.Stdout), "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
 	Warning = log.New(io.MultiWriter(warningFile, os.Stdout), "WARNING ", log.Ldate|log.Ltime|log.Lshortfile)
 	//Error = log.New(io.MultiWriter(errorFile, os.Stderr), "ERROR ", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(io.MultiWriter(errorFile), "ERROR ", log.Ldate|log.Ltime|log.Lshortfile)
+	Error = log.New(io.MultiWriter(errorFile, os.Stderr), "ERROR ", log.Ldate|log.Ltime|log.Lshortfile)
 	MysalInfo = log.New(io.MultiWriter(MysqlFile, os.Stderr), "ERROR ", log.Ldate|log.Ltime|log.Lshortfile)
 }

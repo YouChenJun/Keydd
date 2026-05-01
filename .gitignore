@@ -13,9 +13,14 @@
 *.exe
 
 # Certificates and config (generated at runtime)
+cert/
+config/
 *.pem
 *.crt
 *.key
+
+# Examples (trpc-agent-go examples are large and not needed in repo)
+examples/
 
 # Logs
 log/
