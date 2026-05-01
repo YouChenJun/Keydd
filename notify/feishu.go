@@ -44,6 +44,59 @@ func sendMsg(cardtext string) {
 	time.Sleep(1 * time.Second)
 }
 
+// SendVulnAlert 发送漏洞告警到飞书
+// severity: low/medium/high/critical
+func SendVulnAlert(vulnType, severity, host, path, description, curlCommand string) {
+	severityEmoji := map[string]string{
+		"low":      "🟡",
+		"medium":   "🟠",
+		"high":     "🔴",
+		"critical": "💀",
+	}
+	emoji := severityEmoji[severity]
+	if emoji == "" {
+		emoji = "⚠️"
+	}
+
+	curlSection := ""
+	if curlCommand != "" {
+		curlSection = fmt.Sprintf("\n复现命令: %s", curlCommand)
+	}
+
+	cardtext := fmt.Sprintf(`{
+    "config": {},
+    "i18n_elements": {
+        "zh_cn": [
+            {
+                "tag": "markdown",
+                "content": "漏洞类型: %s\n严重度: %s %s\n目标: %s%s\n描述: %s%s\n<at id=all></at>",
+                "text_align": "left",
+                "text_size": "normal"
+            }
+        ]
+    },
+    "i18n_header": {
+        "zh_cn": {
+            "title": {
+                "tag": "plain_text",
+                "content": "%s 发现漏洞！"
+            },
+            "subtitle": {
+                "tag": "plain_text",
+                "content": ""
+            },
+            "template": "red",
+            "ud_icon": {
+                "tag": "standard_icon",
+                "token": "warning-outlined"
+            }
+        }
+    }
+}`, vulnType, emoji, severity, host, path, description, curlSection, emoji)
+
+	sendMsg(cardtext)
+}
+
 func TaskBeginSendmsg(info *consts.Keyinfo) {
 	cardtext := `
 {

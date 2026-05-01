@@ -20,7 +20,7 @@ func init() {
 func InitDB() *sql.DB {
 	db, err = sql.Open("sqlite", "file:data.db?cache=shared&mode=rwc")
 	if err != nil {
-		logger.Error.Printf("sqlerr:", err)
+		logger.Error.Printf("sqlerr: %v", err)
 	}
 
 	// 创建表的语句
@@ -35,7 +35,7 @@ func InitDB() *sql.DB {
     	Content_Type VARCHAR(255)
     )`)
 	if err != nil {
-		log.Printf("sqlerr:", err)
+		log.Printf("sqlerr: %v", err)
 	}
 	return db
 
@@ -55,7 +55,7 @@ func InsertData(db *sql.DB, data *consts.Keyinfo) bool {
 	err = db.QueryRow(query, data.Host, data.Req_Path, data.RuleName, data.Key_text).Scan(&count)
 	if err != nil && err != sql.ErrNoRows {
 		if err != nil {
-			logger.Error.Printf("查询失败:", err)
+			logger.Error.Printf("查询失败: %v", err)
 		}
 	}
 	if count > 0 {
@@ -64,7 +64,7 @@ func InsertData(db *sql.DB, data *consts.Keyinfo) bool {
 		stmt := "INSERT INTO key_info (RuleName, Host, Req_Path,Req_Body,Res_Body,Key_text,Content_Type) VALUES (?,?,?,?,?,?,?)"
 		_, err = db.Exec(stmt, data.RuleName, data.Host, data.Req_Path, string(data.Req_Body), string(data.Res_Body), data.Key_text, data.Content_Type)
 		if err != nil {
-			logger.Error.Printf("插入失败:", err)
+			logger.Error.Printf("插入失败: %v", err)
 		}
 		return true
 	}

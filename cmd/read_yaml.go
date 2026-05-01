@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"Keydd/ai/config"
 	"Keydd/consts"
 	logger "Keydd/log"
 	"Keydd/utils"
@@ -11,12 +12,17 @@ import (
 
 func Init() {
 	if !utils.FileExists("./config/rule.yaml") {
-		createConfigFile()
+		createRuleConfigFile()
+	}
+	// 创建默认 config.yaml 如果不存在
+	if !utils.FileExists("./config/config.yaml") {
+		createAIConfigFile()
 	}
 }
 
-// 读取配置文件没使用viper 目前不影响使用 不支持热更新
-func ReadYAMLFile() (*consts.Rules, error) {
+// 读取规则配置文件（rule.yaml）
+// 仅包含规则和飞书 webhook
+func ReadRuleYAML() (*consts.Rules, error) {
 	data, err := ioutil.ReadFile("./config/rule.yaml")
 	if err != nil {
 		return nil, err
@@ -29,9 +35,30 @@ func ReadYAMLFile() (*consts.Rules, error) {
 	return &config, nil
 }
 
-// 若没有配置文件，则自动创建
-func createConfigFile() {
-	configContent := []byte(`# 此处规则配置文件来自wih 可以自主编写规则
+// 读取全局配置文件（config.yaml）
+// 包含 AI 功能配置
+func ReadConfigYAML() (*config.AIConfig, error) {
+	if !utils.FileExists("./config/config.yaml") {
+		// 如果配置文件不存在，返回默认配置
+		return config.DefaultAIConfig(), nil
+	}
+	data, err := ioutil.ReadFile("./config/config.yaml")
+	if err != nil {
+		return nil, err
+	}
+	var cfg struct {
+		AI config.AIConfig `yaml:"ai"`
+	}
+	err = yaml.Unmarshal(data, &cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &cfg.AI, nil
+}
+
+// 若没有规则配置文件，则自动创建 rule.yaml
+func createRuleConfigFile() {
+	configContent := []byte(`# 此处规则配置文件来自 wih，可以自主编写规则
 rules:
   # 域名，内置规则
   - id: domain
@@ -103,7 +130,7 @@ rules:
   # 金山云 AccessKey ID
   - id: Kingsoft_AK_ID
     enabled: true
-    pattern: \bAKLT[a-zA-Z0-9-_]{16,28}\b
+    pattern: \bAKLT[a-zA-z0-9-_]{16,28}\b
     test_cases:
       - "AKLTfakeKingsoftKey1234567"
   # 谷歌云 AccessKey ID
@@ -142,7 +169,7 @@ rules:
   #Gitlab V2 Token
   - id: gitlab_v2_token
     enabled: true
-    pattern: \b(glpat-[a-zA-Z0-9\-=_]{20,22})\b
+    pattern: \b(glpat-[a-zA-z0-9\-=_]{20,22})\b
     test_cases:
       - "glpat-FakeGitLabToken12345"
   #Github Token
@@ -248,8 +275,7 @@ exclude_rules:
     enabled: false
 
 # 这里需要去获取飞书webhook
-lark_Webhook: 
-
+lark_Webhook:
 `)
 	err := os.MkdirAll("./config", os.ModePerm)
 	if err != nil {
@@ -258,7 +284,66 @@ lark_Webhook:
 	}
 	err = os.WriteFile("./config/rule.yaml", configContent, 0644)
 	if err != nil {
-		logger.Error.Fatal("创建配置文件失败", err)
+		logger.Error.Fatal("创建规则配置文件失败", err)
 	}
-	logger.Info.Fatal("配置文件创建成功，需要手动修改配置文件中的连接信息")
+	logger.Info.Fatal("规则配置文件创建成功，需要手动修改配置文件中的连接信息")
+}
+
+// 创建默认的全局配置文件 config.yaml（包含 AI 配置）
+func createAIConfigFile() {
+	configContent := []byte(`# Keydd 全局配置
+# 此文件存放 AI 功能配置，规则配置请查看 rule.yaml
+
+# AI 分析功能配置（基于 trpc-agent-go + LLM 的自动化 API 分析）
+ai:
+  # 是否启用 AI 分析功能（默认关闭，需要配置好 LLM 后再开启）
+  enabled: false
+
+  # 大模型配置（支持 OpenAI 及兼容格式，如 DeepSeek、Ollama 等）
+  llm:
+    provider: openai              # 提供商: openai / deepseek / ollama
+    model: gpt-4o-mini            # 模型名称
+    api_key: ""                   # API Key（也可通过 OPENAI_API_KEY 环境变量设置）
+    base_url: "https://api.openai.com/v1"  # API 地址（兼容其他 OpenAI 格式接口）
+    temperature: 0.3              # 生成温度 (0.0-1.0)
+    max_tokens: 4096              # 最大生成 token 数
+    timeout: 60                   # 请求超时（秒）
+
+  # 数据库存储配置
+  store:
+    type: sqlite                    # 数据库类型: sqlite / postgres / mysql
+    sqlite_path: "data_ai.db"      # SQLite 文件路径（type=sqlite 时有效）
+    postgres_dsn: ""               # PostgreSQL 连接字符串（type=postgres 时有效）
+    # 格式: "host=localhost port=5432 user=keydd password=xxx dbname=keydd sslmode=disable"
+
+  # 分析行为配置
+  analysis:
+    business_analysis_enabled: true       # 业务分析（判断是什么业务系统，接口功能）
+    only_analyze_xhr: false               # 只分析 XHR/fetch 请求，默认 false
+
+  # Memory Service 配置（Agent 会话记忆）
+  memory:
+    backend: inmemory              # 后端类型: redis / inmemory
+    redis_addr: ""                 # Redis 地址（backend=redis 时需配置）
+    auto_extract: true             # 是否启用自动记忆提取
+    check_interval: 5              # 自动提取检查间隔（消息条数）
+
+  # 可观测性配置（Langfuse 链路追踪）
+  observability:
+    enabled: false          # 是否启用 Langfuse 链路上报（默认关闭）
+    public_key: ""          # Langfuse Public Key
+    secret_key: ""          # Langfuse Secret Key
+    host: "cloud.langfuse.com:443"
+    insecure: false         # 是否使用非加密连接（仅本地自建开发时设置 true）
+`)
+	err := os.MkdirAll("./config", os.ModePerm)
+	if err != nil {
+		logger.Error.Fatal("创建目录失败:", err)
+		return
+	}
+	err = os.WriteFile("./config/config.yaml", configContent, 0644)
+	if err != nil {
+		logger.Error.Fatal("创建全局配置文件失败", err)
+	}
+	logger.Info.Fatal("全局配置文件创建成功，需要手动修改配置文件中的 AI 连接信息")
 }
